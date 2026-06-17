@@ -141,3 +141,9 @@ dist
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
+
+backend/data/*.sqlite
+backend/data/*.db
+
+backend/uploads/*
+!backend/uploads/.gitkeep
