@@ -1,0 +1,534 @@
+{
+  "info": {
+    "_postman_id": "6f2a29d5-75d1-4f17-8a65-1d5c6d3a0001",
+    "name": "Campus Marketplace API",
+    "description": "Postman collection for validating the 12 REST APIs in the Campus Marketplace MVP. Run requests in order so auth cookies and collection variables are reused across the workflow.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "01 - Register User",
+      "event": [
+        {
+          "listen": "prerequest",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.collectionVariables.set('testEmail', `postman.${Date.now()}@example.com`);",
+              "pm.collectionVariables.set('testPassword', 'password123');"
+            ]
+          }
+        },
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('register returns 201', () => pm.response.to.have.status(201));",
+              "const json = pm.response.json();",
+              "pm.test('registered user has id and email', () => {",
+              "  pm.expect(json.user).to.have.property('id');",
+              "  pm.expect(json.user.email).to.eql(pm.collectionVariables.get('testEmail'));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"name\": \"Postman Student\",\n  \"email\": \"{{testEmail}}\",\n  \"password\": \"{{testPassword}}\",\n  \"phone\": \"9800000000\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/register",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "register"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "02 - Login User",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('login returns 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('login returns current user', () => {",
+              "  pm.expect(json.user.email).to.eql(pm.collectionVariables.get('testEmail'));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"email\": \"{{testEmail}}\",\n  \"password\": \"{{testPassword}}\"\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/login",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "login"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "03 - Get Current User",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('me returns 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('session user is restored from cookie', () => {",
+              "  pm.expect(json.user.email).to.eql(pm.collectionVariables.get('testEmail'));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/me",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "me"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "04 - Create Listing",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('create listing returns 201', () => pm.response.to.have.status(201));",
+              "const json = pm.response.json();",
+              "pm.test('created listing has expected category and id', () => {",
+              "  pm.expect(json.listing).to.have.property('id');",
+              "  pm.expect(json.listing.category).to.eql('Calculator');",
+              "});",
+              "pm.collectionVariables.set('listingId', json.listing.id);"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "title",
+              "value": "Casio fx-991ES Plus",
+              "type": "text"
+            },
+            {
+              "key": "price",
+              "value": "800",
+              "type": "text"
+            },
+            {
+              "key": "category",
+              "value": "Calculator",
+              "type": "text"
+            },
+            {
+              "key": "description",
+              "value": "Used for one semester. Created from Postman API validation.",
+              "type": "text"
+            },
+            {
+              "key": "image",
+              "type": "file",
+              "src": [],
+              "disabled": true,
+              "description": "Optional: enable and attach an image file under 3 MB to validate image upload behavior."
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/listings",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "listings"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "05 - Get Listing By ID",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('get listing by id returns 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('listing id matches collection variable', () => {",
+              "  pm.expect(String(json.listing.id)).to.eql(String(pm.collectionVariables.get('listingId')));",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/listings/{{listingId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "listings",
+            "{{listingId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "06 - Search and Filter Listings",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('search/filter returns 200', () => pm.response.to.have.status(200));",
+              "const listings = pm.response.json().listings;",
+              "pm.test('filtered response contains calculator listing', () => {",
+              "  pm.expect(listings.some((item) => String(item.id) === String(pm.collectionVariables.get('listingId')))).to.eql(true);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/listings?search=calculator&category=Calculator",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "listings"
+          ],
+          "query": [
+            {
+              "key": "search",
+              "value": "calculator"
+            },
+            {
+              "key": "category",
+              "value": "Calculator"
+            }
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "07 - Update Listing",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('update listing returns 200', () => pm.response.to.have.status(200));",
+              "const json = pm.response.json();",
+              "pm.test('listing status updated to sold', () => {",
+              "  pm.expect(json.listing.status).to.eql('sold');",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "PUT",
+        "header": [],
+        "body": {
+          "mode": "formdata",
+          "formdata": [
+            {
+              "key": "title",
+              "value": "Casio fx-991ES Plus - Updated",
+              "type": "text"
+            },
+            {
+              "key": "price",
+              "value": "750",
+              "type": "text"
+            },
+            {
+              "key": "category",
+              "value": "Calculator",
+              "type": "text"
+            },
+            {
+              "key": "description",
+              "value": "Updated through Postman validation.",
+              "type": "text"
+            },
+            {
+              "key": "status",
+              "value": "sold",
+              "type": "text"
+            }
+          ]
+        },
+        "url": {
+          "raw": "{{baseUrl}}/listings/{{listingId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "listings",
+            "{{listingId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "08 - Add Favorite",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('add favorite returns 201', () => pm.response.to.have.status(201));",
+              "const favorites = pm.response.json().favorites;",
+              "pm.test('favorite list includes listing', () => {",
+              "  pm.expect(favorites.some((item) => String(item.id) === String(pm.collectionVariables.get('listingId')))).to.eql(true);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"listingId\": {{listingId}}\n}"
+        },
+        "url": {
+          "raw": "{{baseUrl}}/favorites",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "favorites"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "09 - Get Favorites",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('get favorites returns 200', () => pm.response.to.have.status(200));",
+              "const favorites = pm.response.json().favorites;",
+              "pm.test('favorites response contains saved listing', () => {",
+              "  pm.expect(favorites.some((item) => String(item.id) === String(pm.collectionVariables.get('listingId')))).to.eql(true);",
+              "});"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/favorites",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "favorites"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "10 - Delete Favorite",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('delete favorite returns 204', () => pm.response.to.have.status(204));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/favorites/{{listingId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "favorites",
+            "{{listingId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "11 - Delete Listing",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('delete listing returns 204', () => pm.response.to.have.status(204));"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "DELETE",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/listings/{{listingId}}",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "listings",
+            "{{listingId}}"
+          ]
+        }
+      },
+      "response": []
+    },
+    {
+      "name": "12 - Logout User",
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "pm.test('logout returns 200', () => pm.response.to.have.status(200));",
+              "pm.collectionVariables.unset('listingId');"
+            ]
+          }
+        }
+      ],
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{baseUrl}}/logout",
+          "host": [
+            "{{baseUrl}}"
+          ],
+          "path": [
+            "logout"
+          ]
+        }
+      },
+      "response": []
+    }
+  ],
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          "if (!pm.collectionVariables.get('baseUrl')) {",
+          "  pm.collectionVariables.set('baseUrl', 'http://127.0.0.1:5000/api');",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://127.0.0.1:5000/api",
+      "type": "string"
+    },
+    {
+      "key": "testEmail",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "testPassword",
+      "value": "password123",
+      "type": "string"
+    },
+    {
+      "key": "listingId",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}
