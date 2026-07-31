@@ -7,9 +7,6 @@ const root = fileURLToPath(new URL(".", import.meta.url));
 export default defineConfig({
   plugins: [react()],
   root,
-  optimizeDeps: {
-    exclude: ["@vitejs/plugin-react", "react", "react-dom", "react-dom/client", "lucide-react"]
-  },
   server: {
     host: "127.0.0.1",
     port: 5173,

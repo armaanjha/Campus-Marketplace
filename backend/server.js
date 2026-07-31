@@ -4,7 +4,7 @@ import session from "express-session";
 import { mkdirSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import "./config/db.js";
+import { initializeDatabase } from "./config/db.js";
 import { authRoutes } from "./routes/authRoutes.js";
 import { favoriteRoutes } from "./routes/favoriteRoutes.js";
 import { listingRoutes } from "./routes/listingRoutes.js";
@@ -57,6 +57,13 @@ app.use((err, _req, res, _next) => {
   res.status(400).json({ message: err.message || "Something went wrong." });
 });
 
-app.listen(PORT, () => {
-  console.log(`Campus marketplace API running on http://localhost:${PORT}`);
-});
+initializeDatabase()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Campus marketplace API running on http://localhost:${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("Failed to initialize MySQL database:", err);
+    process.exit(1);
+  });

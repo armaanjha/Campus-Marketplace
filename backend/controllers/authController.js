@@ -16,25 +16,25 @@ export async function register(req, res) {
     return res.status(400).json({ message: "Password must be at least 6 characters." });
   }
 
-  if (findUserByEmail(email)) {
+  if (await findUserByEmail(email)) {
     return res.status(409).json({ message: "An account with this email already exists." });
   }
 
   const hashedPassword = await bcrypt.hash(password, 10);
-  const user = createUser({ name, email, password: hashedPassword, phone });
+  const user = await createUser({ name, email, password: hashedPassword, phone });
   setSessionUser(req, user);
   res.status(201).json({ user });
 }
 
 export async function login(req, res) {
   const { email, password } = req.body;
-  const userRecord = email ? findUserByEmail(email) : null;
+  const userRecord = email ? await findUserByEmail(email) : null;
 
   if (!userRecord || !(await bcrypt.compare(password || "", userRecord.password))) {
     return res.status(401).json({ message: "Invalid email or password." });
   }
 
-  const user = findUserById(userRecord.id);
+  const user = await findUserById(userRecord.id);
   setSessionUser(req, user);
   res.json({ user });
 }
