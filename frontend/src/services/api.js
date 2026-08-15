@@ -1,7 +1,6 @@
-const browserApiBase =
-  typeof window === "undefined" ? "https://campus-marketplace-ej4u.onrender.com/" : `${window.location.protocol}//${window.location.hostname}:5000/api`;
-
-const API_BASE = import.meta.env.VITE_API_URL || browserApiBase;
+const API_BASE =
+  import.meta.env.VITE_API_URL ||
+  "https://campus-marketplace-ej4u.onrender.com/api";
 export const ASSET_BASE = API_BASE.replace(/\/api$/, "");
 
 async function request(path, options = {}) {
