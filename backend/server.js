@@ -16,7 +16,7 @@ mkdirSync(join(__dirname, "uploads"), { recursive: true });
 const app = express();
 const PORT = process.env.PORT || 5000;
 app.use(cors({
-    origin: "https://campus-marketplace-qxpu.onrender.com",
+    origin: "https://campus-marketplace-ten-chi.vercel.app",
     credentials: true
 }));
 const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || "http://localhost:5173";
