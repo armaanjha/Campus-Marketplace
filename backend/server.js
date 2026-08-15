@@ -15,27 +15,15 @@ mkdirSync(join(__dirname, "uploads"), { recursive: true });
 
 const app = express();
 const PORT = process.env.PORT || 5000;
-app.use(cors({
-    origin: "https://campus-marketplace-ten-chi.vercel.app",
-    credentials: true
-}));
-const CLIENT_ORIGIN = process.env.CLIENT_ORIGIN || "http://localhost:5173";
-const allowedOrigins = new Set([
-  CLIENT_ORIGIN,
-  "http://localhost:4173",
-  "http://127.0.0.1:4173",
-  "http://127.0.0.1:5173"
-]);
 
-app.use(
-  cors({
-    origin(origin, callback) {
-      if (!origin || allowedOrigins.has(origin)) return callback(null, true);
-      return callback(new Error("Origin is not allowed by CORS."));
-    },
-    credentials: true
-  })
-);
+const CLIENT_ORIGIN =
+  process.env.CLIENT_ORIGIN || "https://campus-marketplace-ten-chi.vercel.app";
+
+app.use(cors({
+  origin: CLIENT_ORIGIN,
+  credentials: true
+}));
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use("/uploads", express.static(join(__dirname, "uploads")));
